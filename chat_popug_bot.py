@@ -6,7 +6,6 @@ TOKEN = '5787323340:AAH6wYVQ2mrguHBOiOm8FhcMkU2cOaNeGLs'
 bot = telebot.TeleBot(TOKEN)
 
 members = set()
-flag_photo_chat = False
 
 
 @bot.message_handler(commands=['start'])
