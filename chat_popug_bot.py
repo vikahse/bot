@@ -43,11 +43,11 @@ def help_com(message):
                       f'🦜[count all members] - everyone can find out the number of members in the chat\n'
                       f'🦜[usernames of all administrators] - everyone can look at the usernames of all administrators\n'
                       f'🦜[count all administrators] - everyone can find out the number of administrators in the chat\n'
-                      f'🦜[choose someone to ban] - only administrators can choose whom to ban from the list of members, they even can ban other administrators besides themselves\n'
+                      f'🦜[choose someone to ban] - only administrators can choose whom to ban from the list of members, they cannot ban other administrators and themselves\n'
                       f'🦜[delete chat photo] - everyone can delete the chat photo\n'
                       f'🦜[set chat photo with popug] - everyone can change the chat photo by the default photo of popug\n'
-                      f'/ban - only administrators can ban someone from the reply, they even can ban other administrators besides themselves\n'
-                      f'/unban - only administrators can unban someone from the reply, they even can unban other administrators besides themselves\n'
+                      f'/ban - only administrators can ban someone from the reply, they cannot ban other administrators and themselves\n'
+                      f'/unban - only administrators can unban someone from the reply\n'
                       f'/admin - only administrators can make someone an admin, they even can unban other administrators besides themselves, all functions will be available as an administrator\n'
                       f'/id - everyone can get an id of someone by the reply')
 
@@ -90,11 +90,11 @@ def callback_inline_second(call):
                           f'🦜[count all members] - everyone can find out the number of members in the chat\n'
                           f'🦜[usernames of all administrators] - everyone can look at the usernames of all administrators\n'
                           f'🦜[count all administrators] - everyone can find out the number of administrators in the chat\n'
-                          f'🦜[choose someone to ban] - only administrators can choose whom to ban from the list of members, they even can ban other administrators besides themselves\n'
+                          f'🦜[choose someone to ban] - only administrators can choose whom to ban from the list of members, they cannot ban other administrators and themselves\n'
                           f'🦜[delete chat photo] - everyone can delete the chat photo\n'
                           f'🦜[set chat photo with popug] - everyone can change the chat photo by the default photo of popug\n'
-                          f'/ban - only administrators can ban someone from the reply, they even can ban other administrators besides themselves\n'
-                          f'/unban - only administrators can unban someone from the reply, they even can unban other administrators besides themselves\n'
+                          f'/ban - only administrators can ban someone from the reply, they cannot ban other administrators and themselves\n'
+                          f'/unban - only administrators can unban someone from the reply\n'
                           f'/admin - only administrators can make someone an admin, they even can unban other administrators besides themselves, all functions will be available as an administrator\n'
                           f'/id - everyone can get an id of someone by the reply')
 
@@ -167,17 +167,27 @@ def callback_inline_sixth(call):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline_seventh(call):
+    chat = call.message.chat.id
     user_id, user_name = call.data.split()
     user = call.from_user.id
+    user_2 = call.from_user.first_name
+    chat_admins = bot.get_chat_administrators(chat)
+    flag = False
+    for i in chat_admins:
+        if int(i.user.id) == int(user_id):
+            flag = True
+            break
     if int(user) == int(user_id):
         bot.send_message(call.message.chat.id, text=f"The {user_name}, you cannot ban yourself ☠️")
+        return
+    elif flag:
+        bot.send_message(call.message.chat.id, text=f"The {user_2}, you cannot ban the admin {user_name} ☠️")
         return
     else:
         if (user_id, user_name) in members:
             members.remove((user_id, user_name))
         bot.send_message(call.message.chat.id, text=f"The {user_name} is banned ☠️")
         bot.ban_chat_member(call.message.chat.id, user_id)
-
 
 @bot.message_handler(commands=['ban'])
 def ban(message):
@@ -193,8 +203,16 @@ def ban(message):
     if flag:
         user_id = message.reply_to_message.from_user.id
         user_name = message.reply_to_message.from_user.first_name
+        flag2 = False
+        for i in chat_admins:
+            if i.user.id == user_id:
+                flag2 = True
+                break
         if int(user_id1) == int(user_id):
             bot.send_message(message.chat.id, text=f"The {user_name1}, you cannot ban yourself ☠️")
+            return
+        elif flag2:
+            bot.send_message(message.chat.id, text=f"The {user_name1}, you cannot ban the admin {user_name} ☠️")
             return
         else:
             if message.reply_to_message:
@@ -269,7 +287,7 @@ def unban(message):
                                         can_manage_video_chats=True, can_restrict_members=True,
                                         can_promote_members=True,
                                         can_change_info=True, can_post_messages=True, can_edit_messages=True,
-                                        can_invite_users=True, can_pin_messages=True, is_anonymous=True)
+                                        can_invite_users=True, can_pin_messages=True, is_anonymous=False)
     else:
         bot.send_message(message.chat.id,
                          text=f"The popug-{user_name1} isn't the admin and he can't make an admin anyone 🛑")
