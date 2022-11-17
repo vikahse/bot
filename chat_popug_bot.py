@@ -3,12 +3,43 @@ from telebot import types
 from PIL import Image
 from collections import defaultdict
 import os, random
+import time
+import urllib
+import requests
+from io import BytesIO
 
-TOKEN = '5787323340:AAH6wYVQ2mrguHBOiOm8FhcMkU2cOaNeGLs'
 bot = telebot.TeleBot(TOKEN)
 
 ALL_MEMBERS = defaultdict(list)
 MEMBERS_TO_UNBAN = defaultdict(list)
+
+url1 = 'https://i.pinimg.com/564x/66/eb/0a/66eb0aee2073032d2e09e9874460451f.jpg'
+url2 = 'https://krot.info/uploads/posts/2022-03/1646919597_44-krot-info-p-popugai-mem-smeshnie-foto-50.jpg'
+url3 = 'https://i.pinimg.com/originals/96/96/1b/96961b9416c7ad95378dca6350c17a7c.jpg'
+url4 = 'https://i.pinimg.com/736x/6a/15/ea/6a15ea2535530422a3054fe97747ccf2.jpg'
+url5 = 'https://i.pinimg.com/originals/5b/07/d1/5b07d19c87e6d24ebb9111b8a37eeae3.jpg'
+url6 = 'https://i.pinimg.com/736x/5d/fa/df/5dfadfe3d054ece0766a3eeb1b7731c2.jpg'
+url7 = 'https://i.pinimg.com/originals/a3/90/f2/a390f29ac1127aa1c7eccdf18acce90f.jpg'
+url8 = 'https://www.meme-arsenal.com/memes/3bfe3490eea57209cb21d59eca6edab0.jpg'
+url9 = 'https://4tololo.ru/sites/default/files/inline/images/2019/05/13-1139-1881403763.jpg'
+url10 = 'https://i.pinimg.com/originals/ec/63/6d/ec636d6285e3874f967e644049ce2093.jpg'
+url11 = 'https://i.pinimg.com/736x/b7/b3/e9/b7b3e9123159fd9fe4386f34a34fcdf6.jpg'
+url12 = 'https://ih1.redbubble.net/image.583612319.2146/flat,1000x1000,075,f.jpg'
+response1 = requests.get(url1)
+response2 = requests.get(url2)
+response3 = requests.get(url3)
+response4 = requests.get(url4)
+response5 = requests.get(url5)
+response6 = requests.get(url6)
+response7 = requests.get(url7)
+response8 = requests.get(url8)
+response9 = requests.get(url9)
+response10 = requests.get(url10)
+response11 = requests.get(url11)
+response12 = requests.get(url12)
+
+all_photos = [response1, response2, response3, response4, response5, response6, response7, response8, response9,
+              response10, response11, response12]
 
 
 @bot.message_handler(commands=['start'])
@@ -186,9 +217,10 @@ def callback_inline_eighth(call):
 @bot.callback_query_handler(func=lambda call: call.data == "set chat photo with popug")
 def callback_inline_ninth(call):
     try:
-        random_image = random.choice(os.listdir("chat_photos"))
-        path = f'chat_photos/{random_image}'
-        im = Image.open(path)
+        # random_image = random.choice(os.listdir("chat_photos"))
+        # path = f'chat_photos/{random_image}'
+        i = random.randint(0, 11)
+        im = Image.open(BytesIO(all_photos[i].content))
         chat = call.message.chat.id
         bot.set_chat_photo(chat, photo=im)
         user_name = call.from_user.first_name
@@ -551,7 +583,8 @@ def unban(message):
                     user_id = message.reply_to_message.from_user.id
                     user_name = message.reply_to_message.from_user.first_name
                     if int(user_id1) == int(user_id):
-                        bot.send_message(message.chat.id, text=f"The {user_name1}, you cannot make an admin yourself 🛑️")
+                        bot.send_message(message.chat.id,
+                                         text=f"The {user_name1}, you cannot make an admin yourself 🛑️")
                         return
                     else:
                         try:
@@ -564,7 +597,8 @@ def unban(message):
                                                         can_promote_members=True,
                                                         can_change_info=True, can_post_messages=True,
                                                         can_edit_messages=True,
-                                                        can_invite_users=True, can_pin_messages=True, is_anonymous=False)
+                                                        can_invite_users=True, can_pin_messages=True,
+                                                        is_anonymous=False)
                                 if (int(user_id), user_name) not in ALL_MEMBERS[message.chat.id]:
                                     ALL_MEMBERS[message.chat.id].append((int(user_id), user_name))
                                 user_name_who = message.from_user.username
