@@ -58,7 +58,7 @@ def help_com(message):
                       f'🦜[choose someone to unban] - only administrators can choose whom to unban from the list of members\n'
                       f'🦜[choose someone to make an admin] - only administrators can choose whom to make an admin from the list of members\n'
                       f'🦜[delete chat photo] - everyone can delete the chat photo\n'
-                      f'🦜[set chat photo with popug] - everyone can change the chat photo by the default photo of popug\n'
+                      f'🦜[set chat photo with popug] - everyone can change the chat photo by the random photo of popug\n'
                       f'/ban - only administrators can ban someone from the reply, they cannot ban other administrators and themselves\n'
                       f'/unban - only administrators can unban someone from the reply\n'
                       f'/admin - only administrators can make someone an admin, they even can unban other administrators besides themselves, '
@@ -118,7 +118,7 @@ def callback_inline_second(call):
                           f'🦜[choose someone to unban] - only administrators can choose whom to unban from the list of members\n'
                           f'🦜[choose someone to make an admin] - only administrators can choose whom to make an admin from the list of members\n'
                           f'🦜[delete chat photo] - everyone can delete the chat photo\n'
-                          f'🦜[set chat photo with popug] - everyone can change the chat photo by the default photo of popug\n'
+                          f'🦜[set chat photo with popug] - everyone can change the chat photo by the random photo of popug\n'
                           f'/ban - only administrators can ban someone from the reply, they cannot ban other administrators and themselves\n'
                           f'/unban - only administrators can unban someone from the reply\n'
                           f'/admin - only administrators can make someone an admin, they even can unban other administrators besides themselves, '
@@ -365,7 +365,7 @@ def callback_inline_tenth(call):
             bot.send_message(call.message.chat.id, "🦜 All popug-members 🦜", reply_markup=markup)
         else:
             bot.send_message(call.message.chat.id,
-                             text=f"The popug-{user_name} isn't the admin and he can't make an admin anyone 🛑")
+                             text=f"The popug-{user_name} isn't the admin and he cannot make an admin anyone 🛑")
             return
     except telebot.apihelper.ApiTelegramException:
         try:
@@ -465,7 +465,7 @@ def ban(message):
                     except telebot.apihelper.ApiTelegramException:
                         pass
         else:
-            bot.send_message(message.chat.id, text=f"The popug-{user_name1} isn't the admin and he can't ban anyone ❌")
+            bot.send_message(message.chat.id, text=f"The popug-{user_name1} isn't the admin and he cannot ban anyone ❌")
             return
     except telebot.apihelper.ApiTelegramException:
         try:
@@ -514,7 +514,7 @@ def unban(message):
                         pass
         else:
             bot.send_message(message.chat.id,
-                             text=f"The popug-{user_name1} isn't the admin and he can't unban anyone ❌")
+                             text=f"The popug-{user_name1} isn't the admin and he cannot unban anyone ❌")
             return
     except telebot.apihelper.ApiTelegramException:
         try:
@@ -526,59 +526,60 @@ def unban(message):
 @bot.message_handler(commands=['admin'])
 def unban(message):
     try:
-        chat = message.chat.id
-        chat_admins = bot.get_chat_administrators(chat)
-        user_id1 = message.from_user.id
-        user_id2 = message.reply_to_message.from_user.id
-        user_name2 = message.reply_to_message.from_user.first_name
-        user_name1 = message.from_user.first_name
-        flag1 = False
-        flag2 = False
-        for i in chat_admins:
-            if i.user.id == user_id1:
-                flag1 = True
-                break
-        for i in chat_admins:
-            if i.user.id == user_id2:
-                flag2 = True
-                break
-        if flag2:
-            bot.send_message(message.chat.id, text=f"The {user_name2} is the admin")
-            return
-        if flag1:
-            if message.reply_to_message:
-                user_id = message.reply_to_message.from_user.id
-                user_name = message.reply_to_message.from_user.first_name
-                if int(user_id1) == int(user_id):
-                    bot.send_message(message.chat.id, text=f"The {user_name1}, you cannot make an admin yourself 🛑️")
-                    return
-                else:
-                    try:
-                        if message.reply_to_message:
-                            user_id = message.reply_to_message.from_user.id
-                            user_name = message.reply_to_message.from_user.first_name
-                            bot.promote_chat_member(message.chat.id, user_id, can_manage_chat=True,
-                                                    can_delete_messages=True,
-                                                    can_manage_video_chats=True, can_restrict_members=True,
-                                                    can_promote_members=True,
-                                                    can_change_info=True, can_post_messages=True,
-                                                    can_edit_messages=True,
-                                                    can_invite_users=True, can_pin_messages=True, is_anonymous=False)
-                            if (int(user_id), user_name) not in ALL_MEMBERS[message.chat.id]:
-                                ALL_MEMBERS[message.chat.id].append((int(user_id), user_name))
-                            user_name_who = message.from_user.username
-                            user_name_whom = message.reply_to_message.from_user.username
-                            bot.send_message(message.chat.id,
-                                             text=f"The @{user_name_who} asked me to make an admin the @{user_name_whom} too 🎉")
-                    except telebot.apihelper.ApiTelegramException:
+        if message.reply_to_message:
+            chat = message.chat.id
+            chat_admins = bot.get_chat_administrators(chat)
+            user_id1 = message.from_user.id
+            user_id2 = message.reply_to_message.from_user.id
+            user_name2 = message.reply_to_message.from_user.first_name
+            user_name1 = message.from_user.first_name
+            flag1 = False
+            flag2 = False
+            for i in chat_admins:
+                if i.user.id == user_id1:
+                    flag1 = True
+                    break
+            for i in chat_admins:
+                if i.user.id == user_id2:
+                    flag2 = True
+                    break
+            if flag2:
+                bot.send_message(message.chat.id, text=f"The {user_name2} is the admin")
+                return
+            if flag1:
+                if message.reply_to_message:
+                    user_id = message.reply_to_message.from_user.id
+                    user_name = message.reply_to_message.from_user.first_name
+                    if int(user_id1) == int(user_id):
+                        bot.send_message(message.chat.id, text=f"The {user_name1}, you cannot make an admin yourself 🛑️")
+                        return
+                    else:
                         try:
-                            bot.send_message(message.chat.id, "@chat_popug_bot is not the admin")
+                            if message.reply_to_message:
+                                user_id = message.reply_to_message.from_user.id
+                                user_name = message.reply_to_message.from_user.first_name
+                                bot.promote_chat_member(message.chat.id, user_id, can_manage_chat=True,
+                                                        can_delete_messages=True,
+                                                        can_manage_video_chats=True, can_restrict_members=True,
+                                                        can_promote_members=True,
+                                                        can_change_info=True, can_post_messages=True,
+                                                        can_edit_messages=True,
+                                                        can_invite_users=True, can_pin_messages=True, is_anonymous=False)
+                                if (int(user_id), user_name) not in ALL_MEMBERS[message.chat.id]:
+                                    ALL_MEMBERS[message.chat.id].append((int(user_id), user_name))
+                                user_name_who = message.from_user.username
+                                user_name_whom = message.reply_to_message.from_user.username
+                                bot.send_message(message.chat.id,
+                                                 text=f"The @{user_name_who} asked me to make an admin the @{user_name_whom} too 🎉")
                         except telebot.apihelper.ApiTelegramException:
-                            pass
-        else:
-            bot.send_message(message.chat.id,
-                             text=f"The popug-{user_name1} isn't the admin and he can't make an admin anyone 🛑")
-            return
+                            try:
+                                bot.send_message(message.chat.id, "@chat_popug_bot is not the admin")
+                            except telebot.apihelper.ApiTelegramException:
+                                pass
+            else:
+                bot.send_message(message.chat.id,
+                                 text=f"The popug-{user_name1} isn't the admin and he cannot make an admin anyone 🛑")
+                return
     except telebot.apihelper.ApiTelegramException:
         try:
             bot.send_message(message.chat.id, "@chat_popug_bot is not the admin")
